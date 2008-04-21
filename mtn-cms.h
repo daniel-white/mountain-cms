@@ -18,5 +18,4 @@
 #include "http.h"
 #include "sqlite/sqlite3.h"
 
-
 #endif

@@ -118,4 +118,7 @@
 #define MTN_CMS_HTTP_STATUS_GATEWAY_TIME_OUT_S              "504 Gateway Time-out"
 #define MTN_CMS_HTTP_STATUS_HTTP_VERSION_NOT_SUPPORTED_S    "505 HTTP Version not supported"
 
+// Server functions
+void mtn_cms_http_worker(void *data);
+
 #endif
