@@ -3,7 +3,7 @@
 // Daniel A. White
 //
 // mtn-cms.h
-// Stores the HTTP constants
+// The main program
 //
 
 #ifndef MTN_CMS_H
