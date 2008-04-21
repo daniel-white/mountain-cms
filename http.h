@@ -8,16 +8,20 @@
 #ifndef HTTP_H
 #define HTTP_H
 
-// Methods
+// HTTP versions
+#define MTN_CMS_HTTP_VERSION_1_0_S                          "HTTP/1.0"
+#define MTN_CMS_HTTP_VERSION_1_1_S                          "HTTP/1.1"
 
-#define MTN_CMS_HTTP_METHOD_CONNECT                         "CONNECT"
-#define MTN_CMS_HTTP_METHOD_DELETE                          "DELETE"
-#define MTN_CMS_HTTP_METHOD_GET                             "GET"
-#define MTN_CMS_HTTP_METHOD_HEAD                            "HEAD"
-#define MTN_CMS_HTTP_METHOD_OPTIONS                         "OPTIONS"
-#define MTN_CMS_HTTP_METHOD_POST                            "POST"
-#define MTN_CMS_HTTP_METHOD_PUT                             "PUT"
-#define MTN_CMS_HTTP_METHOD_TRACE                           "TRACE"
+// methods
+
+#define MTN_CMS_HTTP_METHOD_CONNECT_S                       "CONNECT"
+#define MTN_CMS_HTTP_METHOD_DELETE_S                        "DELETE"
+#define MTN_CMS_HTTP_METHOD_GET_S                           "GET"
+#define MTN_CMS_HTTP_METHOD_HEAD_S                          "HEAD"
+#define MTN_CMS_HTTP_METHOD_OPTIONS_S                       "OPTIONS"
+#define MTN_CMS_HTTP_METHOD_POST_S                          "POST"
+#define MTN_CMS_HTTP_METHOD_PUT_S                           "PUT"
+#define MTN_CMS_HTTP_METHOD_TRACE_S                         "TRACE"
 
 // status codes as numbers
 
