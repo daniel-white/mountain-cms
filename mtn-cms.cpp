@@ -6,7 +6,7 @@
 // The main program
 //
 
-#include "mtn-cms.cpp"
+#include "mtn-cms.h"
 
 int main(int argc, char **argv)
 {
