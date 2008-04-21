@@ -7,7 +7,7 @@
 //
 
 #include "http.h"
-#include "mtn-cms.cpp"
+#include "mtn-cms.h"
 
 void mtn_cms_http_worker(void *data)
 {
