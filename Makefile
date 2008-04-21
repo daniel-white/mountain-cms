@@ -7,7 +7,7 @@
 ##
 
 mtn-cms: sqlite3.o
-	gcc -o $@ $<
+	g++ -o $@ $< -lpthread
 
 sqlite3.o: sqlite/sqlite3.c
 	gcc -c -o $@ $<
