@@ -57,5 +57,6 @@ void mtn_cms_start_listen(int portnum, int maxconn)
         if (fd == -1)
             return ;
        std::cout << "I am connected to!\n";
+       flush(std::cout);
     }
 }
