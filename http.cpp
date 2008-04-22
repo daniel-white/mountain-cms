@@ -125,8 +125,8 @@ std::string mtn_cms_http_make_response(const mtn_cms_http_response_data& data)
 {
     std::string response;
 
-    response = MTN_CMS_HTTP_VERSION_1_1_S + " ";
-    response += mtn_cms_http_status_to_string(data.status) + '\n';
+    response = MTN_CMS_HTTP_VERSION_1_1_S;
+    response += " " + mtn_cms_http_status_to_string(data.status) + '\n';
 
     return response;
 }
