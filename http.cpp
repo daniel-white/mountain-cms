@@ -50,27 +50,44 @@ std::string mtn_cms_http_status_to_string(int sc)
 			return MTN_CMS_HTTP_STATUS_USE_PROXY_S;
 		case MTN_CMS_HTTP_STATUS_TEMPORARY_REDIRECT:
 			return MTN_CMS_HTTP_STATUS_TEMPORARY_REDIRECT_S;
-/*
+
 		// 400s
-		case MTN_CMS_HTTP_STATUS_BAD_REQUEST                     400
-		case MTN_CMS_HTTP_STATUS_UNAUTHORIZED                    401
-		case MTN_CMS_HTTP_STATUS_PAYMENT_REQUIRED                402
-		case MTN_CMS_HTTP_STATUS_FORBIDDEN                       403
-		case MTN_CMS_HTTP_STATUS_NOT_FOUND                       404
-		case MTN_CMS_HTTP_STATUS_METHOD_NOT_ALLOWED              405
-		case MTN_CMS_HTTP_STATUS_NOT_ACCEPTABLE                  406
-		case MTN_CMS_HTTP_STATUS_PROXY_AUTHENICATION_REQUIRED    407
-		case MTN_CMS_HTTP_STATUS_REQUEST_TIME_OUT                408
-		case MTN_CMS_HTTP_STATUS_CONFLICT                        409
-		case MTN_CMS_HTTP_STATUS_GONE                            410
-		case MTN_CMS_HTTP_STATUS_LENGTH_REQUIRED                 411
-		case MTN_CMS_HTTP_STATUS_PRECONDITION_FAILED             412
-		case MTN_CMS_HTTP_STATUS_REQUEST_ENTITY_TOO_LARGE        413
-		case MTN_CMS_HTTP_STATUS_REQUEST_URI_TOO_LARGE           414
-		case MTN_CMS_HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE          415
-		case MTN_CMS_HTTP_STATUS_REQUEST_RANGE_NOT_SATISFIABLE   416
-		case MTN_CMS_HTTP_STATUS_EXPECTATION_FAILED              417
-		*/
+		case MTN_CMS_HTTP_STATUS_BAD_REQUEST:
+			return MTN_CMS_HTTP_STATUS_BAD_REQUEST_S;
+		case MTN_CMS_HTTP_STATUS_UNAUTHORIZED:
+			return MTN_CMS_HTTP_STATUS_UNAUTHORIZED_S;
+		case MTN_CMS_HTTP_STATUS_PAYMENT_REQUIRED:
+			return MTN_CMS_HTTP_STATUS_PAYMENT_REQUIRED_S;
+		case MTN_CMS_HTTP_STATUS_FORBIDDEN:
+			return MTN_CMS_HTTP_STATUS_FORBIDDEN_S;
+		case MTN_CMS_HTTP_STATUS_NOT_FOUND:
+			return MTN_CMS_HTTP_STATUS_NOT_FOUND_S;
+		case MTN_CMS_HTTP_STATUS_METHOD_NOT_ALLOWED:
+			return MTN_CMS_HTTP_STATUS_METHOD_NOT_ALLOWED_S;
+		case MTN_CMS_HTTP_STATUS_NOT_ACCEPTABLE:
+			return MTN_CMS_HTTP_STATUS_NOT_ACCEPTABLE_S;
+		case MTN_CMS_HTTP_STATUS_PROXY_AUTHENICATION_REQUIRED:
+			return MTN_CMS_HTTP_STATUS_PROXY_AUTHENICATION_REQUIRED_S;
+		case MTN_CMS_HTTP_STATUS_REQUEST_TIME_OUT:
+			return MTN_CMS_HTTP_STATUS_REQUEST_TIME_OUT_S;
+		case MTN_CMS_HTTP_STATUS_CONFLICT:
+			return MTN_CMS_HTTP_STATUS_CONFLICT_S;
+		case MTN_CMS_HTTP_STATUS_GONE:
+			return MTN_CMS_HTTP_STATUS_GONE_S;
+		case MTN_CMS_HTTP_STATUS_LENGTH_REQUIRED:
+			return MTN_CMS_HTTP_STATUS_LENGTH_REQUIRED_S;
+		case MTN_CMS_HTTP_STATUS_PRECONDITION_FAILED:
+			return MTN_CMS_HTTP_STATUS_PRECONDITION_FAILED_S;
+		case MTN_CMS_HTTP_STATUS_REQUEST_ENTITY_TOO_LARGE:
+			return MTN_CMS_HTTP_STATUS_REQUEST_ENTITY_TOO_LARGE_S;
+		case MTN_CMS_HTTP_STATUS_REQUEST_URI_TOO_LARGE:
+			return MTN_CMS_HTTP_STATUS_REQUEST_URI_TOO_LARGE_S;
+		case MTN_CMS_HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE:
+			return MTN_CMS_HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE_S;
+		case MTN_CMS_HTTP_STATUS_REQUEST_RANGE_NOT_SATISFIABLE:
+			return MTN_CMS_HTTP_STATUS_REQUEST_RANGE_NOT_SATISFIABLE_S;
+		case MTN_CMS_HTTP_STATUS_EXPECTATION_FAILED:
+			return MTN_CMS_HTTP_STATUS_EXPECTATION_FAILED_S;
 
 		// 500s
 		case MTN_CMS_HTTP_STATUS_INTERNAL_SERVER_ERROR:
@@ -86,6 +103,7 @@ std::string mtn_cms_http_status_to_string(int sc)
 		case MTN_CMS_HTTP_STATUS_HTTP_VERSION_NOT_SUPPORTED:
 			return MTN_CMS_HTTP_STATUS_HTTP_VERSION_NOT_SUPPORTED_S;
 		
+		// Otherwise...
 		default:
 			return "";
 	}
@@ -94,10 +112,15 @@ std::string mtn_cms_http_status_to_string(int sc)
 void* mtn_cms_http_worker(void *ptr)
 {
     mtn_cms_worker_data *data = (mtn_cms_worker_data *)ptr;
-
-
-
-    write(data->sock, "Hello, World\n", 20);
+	char buf[3];
+	while ( read(data->sock, buf, 3) > 0)
+	{
+		int sc = atoi(buf);
+		std::string status(mtn_cms_http_status_to_string(sc));
+		status += '\n';
+		
+		write(data->sock, status.data(), status.length());
+	}
     close(data->sock);
 }
 
@@ -110,7 +133,7 @@ void mtn_cms_start_listen(int portnum, int maxconn)
     sock = socket(PF_INET, SOCK_STREAM, 0);
     if (sock == -1)
     {
-        perror("Mountain CMS - Unable to open socket.");
+        perror("Mountain CMS - Unable to open socket");
         return;
     }
  
@@ -122,13 +145,13 @@ void mtn_cms_start_listen(int portnum, int maxconn)
     
     if ( bind(sock, (sockaddr *)&saddr, sizeof(saddr)) )
     {
-        perror("Mountain CMS - Unable to bind socket.");
+        perror("Mountain CMS - Unable to bind socket");
         return;
     }
 
     if ( listen(sock, maxconn) )
     {
-        perror("Mountain CMS - Unable to listen on socket.");
+        perror("Mountain CMS - Unable to listen on socket");
         return;
     }
     
