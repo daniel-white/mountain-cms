@@ -20,8 +20,6 @@
 #include <strings.h>
 
 #include <pthread.h>
-
-#include <string>
 #include <iostream>
 
 // Project includes
