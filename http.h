@@ -9,6 +9,8 @@
 #ifndef HTTP_H
 #define HTTP_H
 
+#include "mtn-cms.h"
+
 // HTTP versions
 #define MTN_CMS_HTTP_VERSION_1_0_S                          "HTTP/1.0"
 #define MTN_CMS_HTTP_VERSION_1_1_S                          "HTTP/1.1"
@@ -118,7 +120,12 @@
 #define MTN_CMS_HTTP_STATUS_GATEWAY_TIME_OUT_S              "504 Gateway Time-out"
 #define MTN_CMS_HTTP_STATUS_HTTP_VERSION_NOT_SUPPORTED_S    "505 HTTP Version not supported"
 
-// Server functions
+struct mtn_cms_worker_data
+{
+    int sock;
+};
+
+// HTTP server functions
 void mtn_cms_http_worker(void *data);
 void mtn_cms_start_listen(int port);
 

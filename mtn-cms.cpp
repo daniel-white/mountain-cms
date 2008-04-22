@@ -10,6 +10,6 @@
 
 int main(int argc, char **argv)
 {
-    mtn_cms_start_listen(80);
+    mtn_cms_start_listen(8080, 1);
     return 0;
 }
