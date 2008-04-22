@@ -21,6 +21,10 @@
 
 #include <pthread.h>
 
+#include <iostream>
+#include <string>
+
+
 // Project includes
 #include "http.h"
 #include "sqlite/sqlite3.h"

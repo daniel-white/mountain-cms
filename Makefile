@@ -8,6 +8,7 @@
 
 ## main output
 mtn-cms: mtn-cms.o http.o sqlite3.o
+	svn up
 	g++ -o $@ mtn-cms.o http.o sqlite3.o -lpthread
 	
 ## object files

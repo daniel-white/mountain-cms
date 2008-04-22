@@ -23,7 +23,7 @@ void mtn_cms_start_listen(int portnum, int maxconn)
     int             sock;
  
     sock = socket(PF_INET, SOCK_STREAM, 0);
-    if (sock_id == -1)
+    if (sock == -1)
     {
         perror("Mountain CMS - Unable to open socket.");
         return;
@@ -37,13 +37,13 @@ void mtn_cms_start_listen(int portnum, int maxconn)
     saddr.sin_port = htons(portnum);
     saddr.sin_famly = AF_INET;
     
-    if ( bind(sock_id, (sockaddr *)&saddr, sizeof(saddr)) )
+    if ( bind(sock, (sockaddr *)&saddr, sizeof(saddr)) )
     {
         perror("Mountain CMS - Unable to bind socket.");
         return;
     }
 
-    if ( listen(sock_id, maxconn) )
+    if ( listen(sock, maxconn) )
     {
         perror("Mountain CMS - Unable to listen on socket.");
         return;
@@ -51,9 +51,9 @@ void mtn_cms_start_listen(int portnum, int maxconn)
     while (1)
     {
         int fd;
-        fd = accept(sock_id, NULL, NULL);
+        fd = accept(sock, NULL, NULL);
         if (fd == -1)
             return ;
-       // std::cout << "I am connected to!\n";
+       std::cout << "I am connected to!\n";
     }
 }
