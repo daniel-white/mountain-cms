@@ -48,6 +48,7 @@ void mtn_cms_start_listen(int portnum, int maxconn)
         perror("Mountain CMS - Unable to listen on socket.");
         return;
     }
+    std::cout << "I should be listening...";
     while (1)
     {
         int fd;
