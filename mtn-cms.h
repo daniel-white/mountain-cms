@@ -19,7 +19,7 @@
 #include <time.h>
 #include <strings.h>
 
-#include <pthreads.h>
+#include <pthread.h>
 
 #include <string>
 #include <iostream>
