@@ -28,6 +28,7 @@
 
 
 // Project includes
+#include "mime.h"
 #include "http.h"
 #include "sqlite/sqlite3.h"
 

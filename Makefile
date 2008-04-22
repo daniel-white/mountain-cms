@@ -7,14 +7,15 @@
 ##
 
 ## main output
-mtn-cms: mtn-cms.o http.o sqlite3.o
-	
-	g++ -o $@ mtn-cms.o http.o sqlite3.o -lpthread -ldl
+mtn-cms: mtn-cms.o http.o mime.o sqlite3.o
+	g++ -o $@ mtn-cms.o http.o mime.o sqlite3.o -lpthread -ldl
 	
 ## object files
 mtn-cms.o: mtn-cms.cpp
 	g++ -c -o $@ $<
 http.o: http.cpp
+	g++ -c -o $@ $<
+mime.o: mime.cpp
 	g++ -c -o $@ $<
 sqlite3.o: sqlite/sqlite3.c
 	gcc -c -o $@ $< 
