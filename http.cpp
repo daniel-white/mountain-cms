@@ -30,10 +30,8 @@ void mtn_cms_start_listen(int portnum, int maxconn)
     }
  
     bzero((void *)&saddr, sizeof(saddr));
-    gethostname(hostname, HOSTNAME);
-    hp = gethostbyname(hostname);
     
-    bcopy( (void *)hp->h_addr, (void *)&saddr.sin_addr, hp->h_length);
+    saddr.sin_addr.s_addr = htonl(INADDR_ANY);
     saddr.sin_port = htons(portnum);
     saddr.sin_family = AF_INET;
     
