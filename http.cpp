@@ -141,7 +141,7 @@ void* mtn_cms_http_worker(void *ptr)
 	{
         mtn_cms_http_response_data rdata;
         std::string res;
-        rdata.status = buf;
+        rdata.status = mtn_cms_http_status_to_int(buf);
 
         res = mtn_cms_http_make_response(rdata);
 
