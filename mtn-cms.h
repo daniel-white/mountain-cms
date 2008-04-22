@@ -20,7 +20,6 @@
 #include <strings.h>
 
 #include <pthread.h>
-#include <iostream>
 
 // Project includes
 #include "http.h"

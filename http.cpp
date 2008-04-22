@@ -54,6 +54,6 @@ void mtn_cms_start_listen(int portnum, int maxconn)
         fd = accept(sock_id, NULL, NULL);
         if (fd == -1)
             return ;
-        std::cout << "I am connected to!\n";
+       // std::cout << "I am connected to!\n";
     }
 }
