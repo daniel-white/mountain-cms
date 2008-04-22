@@ -50,7 +50,7 @@ void mtn_cms_start_listen(int portnum, int maxconn)
         return;
     }
     
-    std::list<mtn_cms_thread_data*> thread_data;
+    std::vector<mtn_cms_thread_data*> thread_data;
     while (1)
     {
         int fd;
@@ -60,7 +60,7 @@ void mtn_cms_start_listen(int portnum, int maxconn)
         mtn_cms_thread_data *td = new mtn_cms_thread_data();
         thread_data.push_back(td);
         td->data.sock = fd;
-        pthread_create(td->thread, NULL, mtn_cms_http_worker, (void *)&td->data);
+        pthread_create(&td->thread, NULL, mtn_cms_http_worker, (void *)&td->data);
         pthread_join(td->thread, NULL);
     }
     
