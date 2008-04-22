@@ -54,12 +54,20 @@ void mtn_cms_start_listen(int portnum, int maxconn)
     while (1)
     {
         int fd;
-        fd = accept(sock, NULL, NULL);
+        sockaddr addr; 
+        socklen_t addrlen;
+        fd = accept(sock, &addr, &addrlen);
         if (fd == -1)
             return ;
+
         mtn_cms_thread_data *td = new mtn_cms_thread_data();
         thread_data.push_back(td);
+
         td->data.sock = fd;
+        td->data.addr = addr;
+        td->data.addrlen = fd;
+
+
         pthread_create(&td->thread, NULL, mtn_cms_http_worker, (void *)&td->data);
         pthread_join(td->thread, NULL);
     }

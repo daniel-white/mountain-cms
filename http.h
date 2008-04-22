@@ -123,6 +123,8 @@
 struct mtn_cms_worker_data
 {
     int sock;
+    sockaddr addr; 
+    socklen_t addrlen;
 };
 
 struct mtn_cms_thread_data
