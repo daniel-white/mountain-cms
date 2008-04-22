@@ -125,6 +125,12 @@ struct mtn_cms_worker_data
     int sock;
 };
 
+struct mtn_cms_thread_data
+{
+    mtn_cms_worker_data data;
+    pthread_t thread;
+}
+
 // HTTP server functions
 void mtn_cms_http_worker(void *data);
 void mtn_cms_start_listen(int port, int maxconn);

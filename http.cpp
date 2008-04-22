@@ -10,9 +10,12 @@
 
 #define HOSTNAME 512
 
-void mtn_cms_http_worker(void *data)
+void mtn_cms_http_worker(void *ptr)
 {
+    mtn_cms_worker_data *data = (mtn_cms_worker_data *)ptr;
 
+    write(data->sock, "Hello, World\n", 20);
+    close(data->sock);
 }
 
 void mtn_cms_start_listen(int portnum, int maxconn)
@@ -46,15 +49,24 @@ void mtn_cms_start_listen(int portnum, int maxconn)
         perror("Mountain CMS - Unable to listen on socket.");
         return;
     }
-    std::cout << "I should be listening...";
-    flush(std::cout);
+    
+    std::list<mtn_cms_thread_data*> thread_data;
     while (1)
     {
         int fd;
         fd = accept(sock, NULL, NULL);
         if (fd == -1)
             return ;
-       std::cout << "I am connected to!\n";
-       flush(std::cout);
+        mtn_cms_thread_data *td = new mtn_cms_thread_data();
+        thread_data.push_back(td);
+        td->data.sock = fd;
+        pthread_create(td->thread, NULL, mtn_cms_http_worker, (void *)&td->data);
+        pthread_join(td->thread, NULL);
+    }
+    
+    int size=thread_data.size();
+    for (int i=0; i<size; i++)
+    {
+        delete thread_data[i];
     }
 }
