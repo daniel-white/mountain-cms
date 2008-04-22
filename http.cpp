@@ -33,9 +33,9 @@ void mtn_cms_start_listen(int portnum, int maxconn)
     gethostname(hostname, HOSTNAME);
     hp = gethostbyname(hostname);
     
-    bcopy( (void *)hp->h_addr, (void *)&saddress.sin_addr, hp->h_length);
+    bcopy( (void *)hp->h_addr, (void *)&saddr.sin_addr, hp->h_length);
     saddr.sin_port = htons(portnum);
-    saddr.sin_famly = AF_INET;
+    saddr.sin_family = AF_INET;
     
     if ( bind(sock, (sockaddr *)&saddr, sizeof(saddr)) )
     {
