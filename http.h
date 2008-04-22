@@ -135,6 +135,14 @@ struct mtn_cms_worker_data
     socklen_t addrlen;
 };
 
+struct mtn_cms_http_response_data
+{
+
+    char *mime_type;
+    unsigned int len;
+    int status;
+};
+
 struct mtn_cms_thread_data
 {
     mtn_cms_worker_data data;
@@ -148,5 +156,8 @@ void mtn_cms_start_listen(int port, int maxconn);
 // data manipulation
 std::string mtn_cms_http_status_to_string(int sc);
 int mtn_cms_http_status_to_int(const char *status);
+
+// Header manipulation
+std::string mtn_cms_http_make_response(const mtn_cms_http_response_data& data);
 
 #endif
