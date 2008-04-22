@@ -78,6 +78,9 @@
 #define MTN_CMS_HTTP_STATUS_GATEWAY_TIME_OUT                504
 #define MTN_CMS_HTTP_STATUS_HTTP_VERSION_NOT_SUPPORTED      505
 
+#define MTN_CMS_HTTP_MIN_STATUS								MTN_CMS_HTTP_STATUS_CONTINUE 
+#define MTN_CMS_HTTP_MAX_STATUS								MTN_CMS_HTTP_STATUS_HTTP_VERSION_NOT_SUPPORTED
+
 // status codes as strings
 
 #define MTN_CMS_HTTP_STATUS_CONTINUE_S                      "100 Continue"
@@ -144,5 +147,6 @@ void mtn_cms_start_listen(int port, int maxconn);
 
 // data manipulation
 std::string mtn_cms_http_status_to_string(int sc);
+int mtn_cms_http_status_to_int(const char *status);
 
 #endif

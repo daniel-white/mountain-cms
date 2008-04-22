@@ -103,21 +103,35 @@ std::string mtn_cms_http_status_to_string(int sc)
 		case MTN_CMS_HTTP_STATUS_HTTP_VERSION_NOT_SUPPORTED:
 			return MTN_CMS_HTTP_STATUS_HTTP_VERSION_NOT_SUPPORTED_S;
 		
+		break;
 		// Otherwise...
 		default:
-			return "";
+			return MTN_CMS_HTTP_STATUS_HTTP_VERSION_NOT_SUPPORTED_S;
 	}
+}
+
+int mtn_cms_http_status_to_int(const char *status)
+{
+	char *end_ptr = NULL;
+	int ret = (int) strtol(status, &end_ptr, 0);
+
+	if ( (ret <= MTN_CMS_HTTP_MAX_STATUS) && (ret >= MTN_CMS_HTTP_MIN_STATUS) )
+		return ret;
+	else
+		return MTN_CMS_HTTP_STATUS_HTTP_VERSION_NOT_SUPPORTED;
 }
 
 void* mtn_cms_http_worker(void *ptr)
 {
     mtn_cms_worker_data *data = (mtn_cms_worker_data *)ptr;
-	char buf[3];
-	while ( read(data->sock, buf, 3) > 0)
+	char buf[5] = { '\0' };
+	while ( read(data->sock, buf, 5) > 0)
 	{
-		int sc = atoi(buf);
+		int sc = mtn_cms_http_status_to_int(buf);
 		std::string status(mtn_cms_http_status_to_string(sc));
 		status += '\n';
+		std::cout << status;
+		flush(std::cout);
 		
 		write(data->sock, status.data(), status.length());
 	}
