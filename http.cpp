@@ -137,6 +137,14 @@ void* mtn_cms_http_worker(void *ptr)
 	char buf[5] = { '\0' };
 	while ( read(data->sock, buf, 5) > 0)
 	{
+        mtn_cms_http_response_data rdata;
+        std::string res;
+        rdata.status = 200;
+
+        res = mtn_cms_http_make_response(rdata);
+
+        write(data->sock, res.data(), res.length());
+
 		int sc = mtn_cms_http_status_to_int(buf);
 		std::string status(mtn_cms_http_status_to_string(sc));
 		status += '\n';
