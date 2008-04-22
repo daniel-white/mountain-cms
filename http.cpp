@@ -49,6 +49,7 @@ void mtn_cms_start_listen(int portnum, int maxconn)
         return;
     }
     std::cout << "I should be listening...";
+    flush(std::cout);
     while (1)
     {
         int fd;
