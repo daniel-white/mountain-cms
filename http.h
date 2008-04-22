@@ -132,7 +132,7 @@ struct mtn_cms_thread_data
 };
 
 // HTTP server functions
-void mtn_cms_http_worker(void *data);
+void* mtn_cms_http_worker(void *data);
 void mtn_cms_start_listen(int port, int maxconn);
 
 #endif

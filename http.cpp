@@ -10,7 +10,7 @@
 
 #define HOSTNAME 512
 
-void mtn_cms_http_worker(void *ptr)
+void* mtn_cms_http_worker(void *ptr)
 {
     mtn_cms_worker_data *data = (mtn_cms_worker_data *)ptr;
 
