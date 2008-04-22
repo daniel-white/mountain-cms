@@ -127,6 +127,8 @@ std::string mtn_cms_http_make_response(const mtn_cms_http_response_data& data)
 
     response = MTN_CMS_HTTP_VERSION_1_1_S;
     response += " " + mtn_cms_http_status_to_string(data.status) + '\n';
+    response += "Date: 0 " + '\n';
+    response += "Server: " + MTN_CMS_HTTP_SERVER_NAME_S + '\n';
 
     return response;
 }
@@ -139,7 +141,7 @@ void* mtn_cms_http_worker(void *ptr)
 	{
         mtn_cms_http_response_data rdata;
         std::string res;
-        rdata.status = 200;
+        rdata.status = buf;
 
         res = mtn_cms_http_make_response(rdata);
 
@@ -151,7 +153,7 @@ void* mtn_cms_http_worker(void *ptr)
 		std::cout << status;
 		flush(std::cout);
 		
-		write(data->sock, status.data(), status.length());
+		//write(data->sock, status.data(), status.length());
 	}
     close(data->sock);
 }
