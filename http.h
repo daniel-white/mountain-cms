@@ -12,9 +12,9 @@
 #include "mtn-cms.h"
 
 // Mountain CMS HTTP server defines
-#define MTN_CMS_HTTP_SERVER_NAME_S							"Mountain CMS"
-#define MTN_CMS_HTTP_SERVER_VERSION_S						"EarlyAlpha"
-#define MTN_CMS_HTTP_SERVER_DEFAULT_PORT					80
+#define MTN_CMS_HTTP_SERVER_NAME_S                           "Mountain CMS"
+#define MTN_CMS_HTTP_SERVER_VERSION_S                        "EarlyAlpha"
+#define MTN_CMS_HTTP_SERVER_DEFAULT_PORT                     80
 
 // HTTP versions
 #define MTN_CMS_HTTP_VERSION_1_0_S                          "HTTP/1.0"
@@ -138,8 +138,9 @@ struct mtn_cms_worker_data
 struct mtn_cms_http_response_data
 {
 
-    char *mime_type;
-    unsigned int len;
+    std::string content_type;
+    std::string content_encoding;
+    unsigned int length;
     int status;
 };
 

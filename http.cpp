@@ -123,15 +123,39 @@ int mtn_cms_http_status_to_int(const char *status)
 
 std::string mtn_cms_http_make_response(const mtn_cms_http_response_data& data)
 {
-    std::string response;
+    std::ostringstream response;
 
-    response = MTN_CMS_HTTP_VERSION_1_1_S;
-    response += " " + mtn_cms_http_status_to_string(data.status) + '\n';
-    response += "Date: 0 \n";
-    response += "Server: " + MTN_CMS_HTTP_SERVER_NAME_S + '\n';
+    //The status line 
+    response << MTN_CMS_HTTP_VERSION_1_1_S;
+    response << " " << mtn_cms_http_status_to_string(data.status) << "\n";
 
-    return response;
+
+    //The date and time
+    time_t t = time(NULL);
+    tm time;
+    gmtime_r(&t, &time);
+
+    response << "Date: Wed, "
+             // <<
+             << time.tm_mday 
+             << " Apr " 
+             << time.tm_year  << "\n" ;
+
+
+    response << "Server: " << MTN_CMS_HTTP_SERVER_NAME_S << "\n";
+
+    if (data.length)
+      response << "Length: " << data.length << "\n";
+
+    if (data.content_type.length())
+      response << "Content-Type: " << data.content_type << "\n";
+
+    if (data.content_encoding.length())
+      response << "Content-Encoding: " << data.content_encoding << "\n";
+
+    return response.str();
 }
+
 
 void* mtn_cms_http_worker(void *ptr)
 {
