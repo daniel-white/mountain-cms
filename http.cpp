@@ -8,6 +8,64 @@
 
 #include "http.h"
 
+std::string mtn_cms_http_time_to_gmt_string(const time_t& t)
+{
+  std::ostringstream s;
+  tm time;
+  gmtime_r(&t, &time);
+
+  switch (time.tm_wday)
+  {
+    case 0: s << "Sun, "; break;
+    case 1: s << "Mon, "; break;
+    case 2: s << "Tue, "; break;
+    case 3: s << "Wed, "; break;
+    case 4: s << "Thu, "; break;
+    case 5: s << "Fri, "; break;
+    case 6: s << "Sat, ";
+  }
+  
+  if (time.tm_mday < 10)
+    s << "0" << time.tm_mday;
+  else
+    s << time.tm_mday;
+
+  switch (time.tm_mon)
+  {
+    case 0: s << " Jan "; break;
+    case 1: s << " Feb "; break;
+    case 2: s << " Mar "; break;
+    case 3: s << " Apr "; break;
+    case 4: s << " May "; break;
+    case 5: s << " Jun "; break;
+    case 6: s << " Jul "; break;
+    case 7: s << " Aug "; break;
+    case 8: s << " Sep "; break;
+    case 9: s << " Oct "; break;
+    case 10: s << " Nov "; break;
+    case 11: s << " Dec ";
+  }
+  
+  s << time.tm_year + 1900 << " ";
+
+  if (time.tm_hour < 10)
+    s << "0" << time.tm_hour << ":";
+  else
+    s << time.tm_hour << ":";
+
+  if (time.tm_min < 10)
+    s << "0" << time.tm_min << ":";
+  else
+    s << time.tm_min << ":";
+
+  if (time.tm_sec < 10)
+    s << "0" << time.tm_sec << " GMT";
+  else
+    s << time.tm_sec << " GMT";
+
+
+  return s.str();
+}
 
 std::string mtn_cms_http_status_to_string(int sc)
 {
@@ -132,15 +190,7 @@ std::string mtn_cms_http_make_response(const mtn_cms_http_response_data& data)
 
     //The date and time
     time_t t = time(NULL);
-    tm time;
-    gmtime_r(&t, &time);
-
-    response << "Date: Wed, "
-             // <<
-             << time.tm_mday 
-             << " Apr " 
-             << time.tm_year  << "\n" ;
-
+    response << "Date: " << mtn_cms_http_time_to_gmt_string(t) << "\n";
 
     response << "Server: " << MTN_CMS_HTTP_SERVER_NAME_S << "\n";
 
@@ -166,6 +216,7 @@ void* mtn_cms_http_worker(void *ptr)
         mtn_cms_http_response_data rdata;
         std::string res;
         rdata.status = mtn_cms_http_status_to_int(buf);
+	rdata.length = 27;
 
         res = mtn_cms_http_make_response(rdata);
 
