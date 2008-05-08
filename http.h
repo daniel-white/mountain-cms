@@ -31,6 +31,15 @@
 #define MTN_CMS_HTTP_METHOD_PUT_S                           "PUT"
 #define MTN_CMS_HTTP_METHOD_TRACE_S                         "TRACE"
 
+#define MTN_CMS_HTTP_METHOD_CONNECT                         0
+#define MTN_CMS_HTTP_METHOD_DELETE                          1
+#define MTN_CMS_HTTP_METHOD_GET                             2
+#define MTN_CMS_HTTP_METHOD_HEAD                            3
+#define MTN_CMS_HTTP_METHOD_OPTIONS                         4
+#define MTN_CMS_HTTP_METHOD_POST                            5
+#define MTN_CMS_HTTP_METHOD_PUT                             6
+#define MTN_CMS_HTTP_METHOD_TRACE                           7
+
 // status codes as numbers
 
 #define MTN_CMS_HTTP_STATUS_CONTINUE                        100
@@ -135,6 +144,13 @@ struct mtn_cms_worker_data
     socklen_t addrlen;
 };
 
+struct mtn_cms_http_request_data
+{
+  std::string page;
+  int method;
+  std::string http;
+};
+
 struct mtn_cms_http_response_data
 {
 
@@ -153,10 +169,13 @@ struct mtn_cms_thread_data
 // HTTP server functions
 void* mtn_cms_http_worker(void *data);
 void mtn_cms_start_listen(int port, int maxconn);
+void mtn_cms_read_header(int sock, mtn_cms_http_request_data& request);
+
 
 // data manipulation
 std::string mtn_cms_http_status_to_string(int sc);
 int mtn_cms_http_status_to_int(const char *status);
+std::string mtn_cms_http_time_to_gmt_string(const time_t& t);
 
 // Header manipulation
 std::string mtn_cms_http_make_response(const mtn_cms_http_response_data& data);

@@ -183,6 +183,7 @@ std::string mtn_cms_http_make_response(const mtn_cms_http_response_data& data)
 {
     std::ostringstream response;
 
+
     //The status line 
     response << MTN_CMS_HTTP_VERSION_1_1_S;
     response << " " << mtn_cms_http_status_to_string(data.status) << "\n";
@@ -209,32 +210,60 @@ std::string mtn_cms_http_make_response(const mtn_cms_http_response_data& data)
 
 void* mtn_cms_http_worker(void *ptr)
 {
+  perror("here");
+  // flush(3);
     mtn_cms_worker_data *data = (mtn_cms_worker_data *)ptr;
-	char buf[5] = { '\0' };
-	while ( read(data->sock, buf, 5) > 0)
-	{
-        mtn_cms_http_response_data rdata;
-        std::string res;
-        rdata.status = mtn_cms_http_status_to_int(buf);
-	rdata.length = 27;
+    mtn_cms_http_request_data request;
+    mtn_cms_http_response_data response;
+    mtn_cms_read_header(data->sock, request);
+    std::cout << request.page;
+   
+    response.status = 404;
+    std::string response_s = mtn_cms_http_make_response(response);
 
-        res = mtn_cms_http_make_response(rdata);
-
-        write(data->sock, res.data(), res.length());
-
-		int sc = mtn_cms_http_status_to_int(buf);
-		std::string status(mtn_cms_http_status_to_string(sc));
-		status += '\n';
-		std::cout << status;
-		flush(std::cout);
-		
-		//write(data->sock, status.data(), status.length());
-	}
+    //write(data->sock, response_s.data(), response_s.length());
+	
     close(data->sock);
+}
+
+void mtn_cms_read_header(int sock, mtn_cms_http_request_data& request)
+{
+  char header[535] = { '\0' };
+  int bytes = read(sock, header, 535);
+  
+  char method[11] = { '\0' };
+  char page[513] = { '\0' };
+  char http[11] = { '\0' };
+
+  sscanf(header, "%10s %512s %10s", method, page, http);
+
+  if (strcmp(method, MTN_CMS_HTTP_METHOD_CONNECT_S) == 0 )
+    request.method = MTN_CMS_HTTP_METHOD_CONNECT;
+  else if (strcmp(method, MTN_CMS_HTTP_METHOD_DELETE_S) == 0 )
+    request.method = MTN_CMS_HTTP_METHOD_DELETE;
+  else if (strcmp(method, MTN_CMS_HTTP_METHOD_GET_S) == 0 )
+    request.method = MTN_CMS_HTTP_METHOD_GET;
+  else if (strcmp(method, MTN_CMS_HTTP_METHOD_HEAD_S) == 0 )
+    request.method = MTN_CMS_HTTP_METHOD_HEAD;
+  else if (strcmp(method, MTN_CMS_HTTP_METHOD_OPTIONS_S) == 0 )
+    request.method = MTN_CMS_HTTP_METHOD_OPTIONS;
+  else if (strcmp(method, MTN_CMS_HTTP_METHOD_POST_S) == 0 )
+    request.method = MTN_CMS_HTTP_METHOD_POST;
+  else if (strcmp(method, MTN_CMS_HTTP_METHOD_PUT_S) == 0 )
+    request.method = MTN_CMS_HTTP_METHOD_PUT;
+  else if (strcmp(method, MTN_CMS_HTTP_METHOD_TRACE_S) == 0 )
+    request.method = MTN_CMS_HTTP_METHOD_CONNECT;
+  else
+    request.method = -1;
+
+  request.page = page;
+  request.http = http;
+
 }
 
 void mtn_cms_start_listen(int portnum, int maxconn)
 {
+  int yes=1;
     sockaddr_in     saddr;
     hostent         *hp;
     int             sock;
@@ -245,6 +274,13 @@ void mtn_cms_start_listen(int portnum, int maxconn)
         perror("Mountain CMS - Unable to open socket");
         return;
     }
+
+    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
+      {
+	perror("Mountain CMS - Unable to set socket option");
+	exit(-1);
+      } 
+
  
     bzero((void *)&saddr, sizeof(saddr));
     
@@ -257,6 +293,7 @@ void mtn_cms_start_listen(int portnum, int maxconn)
         perror("Mountain CMS - Unable to bind socket");
         return;
     }
+
 
     if ( listen(sock, maxconn) )
     {
@@ -271,19 +308,22 @@ void mtn_cms_start_listen(int portnum, int maxconn)
         sockaddr addr; 
         socklen_t addrlen;
         fd = accept(sock, &addr, &addrlen);
-        if (fd == -1)
-            return ;
+        if (fd != -1)
+	{
+	  
 
-        mtn_cms_thread_data *td = new mtn_cms_thread_data();
-        thread_data.push_back(td);
+          mtn_cms_thread_data *td = new mtn_cms_thread_data();
+          thread_data.push_back(td);
 
-        td->data.sock = fd;
-        td->data.addr = addr;
-        td->data.addrlen = fd;
+          td->data.sock = fd;
+          td->data.addr = addr;
+          td->data.addrlen = fd;
 
-
-        pthread_create(&td->thread, NULL, mtn_cms_http_worker, (void *)&td->data);
-        pthread_join(td->thread, NULL);
+	  perror("here");
+          pthread_create(&td->thread, NULL, mtn_cms_http_worker, (void *)&td->data);
+          pthread_join(td->thread, NULL);
+	 
+	}
     }
     
     int size=thread_data.size();
