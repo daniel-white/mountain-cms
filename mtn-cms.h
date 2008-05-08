@@ -32,5 +32,7 @@
 #include "mime.h"
 #include "http.h"
 #include "sqlite/sqlite3.h"
+#include "sqlite/CppSQLite3.cpp"
+#include "pb.h"
 
 #endif
