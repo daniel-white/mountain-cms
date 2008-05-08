@@ -35,4 +35,6 @@
 #include "sqlite/CppSQLite3.h"
 #include "pb.h"
 
+// The database
+
 #endif

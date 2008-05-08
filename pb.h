@@ -18,15 +18,16 @@ struct mtn_cms_http_request_data;
 struct mtn_cms_cache_item
 {
   std::string data;
-  time_t created;
-  int tol;
+  int created;
+  int ttl;
   bool valid;
 
-  mtn_cms_cache_item() { created = 0; tol = 0; valid=false; }
+  mtn_cms_cache_item() { created = 0; ttl = 0; valid=false; }
 };
 
 class mtn_cms_page_builder
 {
+ public:
   void getpage( mtn_cms_http_response_data* response,
 	        mtn_cms_http_request_data* request,
 		CppSQLite3DB* db,
@@ -36,10 +37,9 @@ class mtn_cms_page_builder
   mtn_cms_http_response_data* _response;
   mtn_cms_http_request_data* _request;
 
-  std::string datestamp(const time_t& time);
+  std::string datestamp(const time_t& time, int ttl);
   bool getcache(const std::string& page, mtn_cms_cache_item* cache_item);
   void storecache(const std::string& page, mtn_cms_cache_item* cache_item);
   std::string buildpage(std::string page); 
 };
-
 #endif

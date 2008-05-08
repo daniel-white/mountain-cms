@@ -10,6 +10,7 @@
 #define HTTP_H
 
 #include "mtn-cms.h"
+#include "sqlite/CppSQLite3.h"
 
 // Mountain CMS HTTP server defines
 #define MTN_CMS_HTTP_SERVER_NAME_S                           "Mountain CMS"
@@ -170,7 +171,7 @@ struct mtn_cms_thread_data
 
 // HTTP server functions
 void* mtn_cms_http_worker(void *data);
-void mtn_cms_start_listen(int port, int maxconn);
+void mtn_cms_start_listen(int port, int maxconn, CppSQLite3DB& db);
 void mtn_cms_read_header(int sock, mtn_cms_http_request_data& request);
 
 
