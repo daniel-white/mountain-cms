@@ -158,6 +158,8 @@ struct mtn_cms_http_response_data
     std::string content_encoding;
     unsigned int length;
     int status;
+
+  mtn_cms_http_response_data() { length = 0; status = 0; }
 };
 
 struct mtn_cms_thread_data

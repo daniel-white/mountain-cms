@@ -210,18 +210,26 @@ std::string mtn_cms_http_make_response(const mtn_cms_http_response_data& data)
 
 void* mtn_cms_http_worker(void *ptr)
 {
-  perror("here");
-  // flush(3);
+ 
     mtn_cms_worker_data *data = (mtn_cms_worker_data *)ptr;
     mtn_cms_http_request_data request;
     mtn_cms_http_response_data response;
     mtn_cms_read_header(data->sock, request);
-    std::cout << request.page;
-   
-    response.status = 404;
+    
+    switch(request.method)
+    {
+    case MTN_CMS_HTTP_METHOD_GET:
+      response.status = 200;
+      break;
+    default:
+      response.status = 505;
+      break;
+    }
+    
+    //    response.status = 404;
     std::string response_s = mtn_cms_http_make_response(response);
 
-    //write(data->sock, response_s.data(), response_s.length());
+    write(data->sock, response_s.data(), response_s.length());
 	
     close(data->sock);
 }
@@ -235,7 +243,9 @@ void mtn_cms_read_header(int sock, mtn_cms_http_request_data& request)
   char page[513] = { '\0' };
   char http[11] = { '\0' };
 
+  
   sscanf(header, "%10s %512s %10s", method, page, http);
+
 
   if (strcmp(method, MTN_CMS_HTTP_METHOD_CONNECT_S) == 0 )
     request.method = MTN_CMS_HTTP_METHOD_CONNECT;
@@ -275,7 +285,7 @@ void mtn_cms_start_listen(int portnum, int maxconn)
         return;
     }
 
-    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
+     if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)))
       {
 	perror("Mountain CMS - Unable to set socket option");
 	exit(-1);
@@ -304,10 +314,12 @@ void mtn_cms_start_listen(int portnum, int maxconn)
     std::vector<mtn_cms_thread_data*> thread_data;
     while (1)
     {
+      
         int fd;
         sockaddr addr; 
-        socklen_t addrlen;
+        socklen_t addrlen = sizeof(sockaddr);
         fd = accept(sock, &addr, &addrlen);
+
         if (fd != -1)
 	{
 	  
@@ -317,7 +329,7 @@ void mtn_cms_start_listen(int portnum, int maxconn)
 
           td->data.sock = fd;
           td->data.addr = addr;
-          td->data.addrlen = fd;
+          td->data.addrlen = addrlen;
 
 	  perror("here");
           pthread_create(&td->thread, NULL, mtn_cms_http_worker, (void *)&td->data);
