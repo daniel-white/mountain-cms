@@ -1,0 +1,48 @@
+Mountain CMS Notes
+Daniel A. White
+
+This is by far a very incomplete web server using pthreads and sqlite.
+
+All you need to do to compile it is call to `make`. This will build everything.
+
+To run it, execute `./mtn-cms`.  No parameters are implemeted at this time.
+
+To test, run `telnet` with like this from another terminal
+  
+  telnet localhost 27000
+
+To retrieve a page (only page1 and page2 exist); type `GET page1` or 
+`GET page2`
+
+If run in succession (within the 60 time to live window), the page returned
+will be from cache.  The pages are date stamped to show this. Once 60 seconds
+has elapsed, the cache is no longer used, but then the page is rebuilt and 
+stamped.
+
+This is my basic structure.
+
+
+     ~~ Main Thread ~~
+     	  | Open and listen for connection
+     	  | On accept() unblocking
+     	  | \
+	  |  | ~~ Child Thread (mtn_cms_http_worker) ~~
+	  |    	  \
+	  |	   | Read the header
+	  |	   | Process the header
+	  |	   | Get the Page (or build it if needed)
+	  | 	   | Build response header
+	  |	   | Write the response header
+	  |	   | Write the page data
+	  |	   | Close the connection
+          |        * Thread dies
+	  | Loop back and wait for another on accept()
+
+
+
+I hope this is all good for you.  I am so sorry it took me so long.
+
+Some notes:  I didnt write CppSqlite3 or even SQLite for that matter.  Its from 
+     <http://www.codeproject.com/KB/database/CppSQLite.aspx>
+
+Have a great time in China.
