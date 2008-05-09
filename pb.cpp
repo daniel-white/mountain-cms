@@ -53,7 +53,7 @@ std::string mtn_cms_page_builder::datestamp(const time_t& time, int ttl)
 
 bool mtn_cms_page_builder::getcache(const std::string& page, mtn_cms_cache_item* cache_item)
 {
-  std::string _q = "SELECT * FROM `page_cache` WHERE page = \'" + page + "\'"; 
+  std::string _q = "SELECT * FROM `page_cache` WHERE page = \'" + page + "\';"; 
 try
   {
   CppSQLite3Query q = _db->execQuery(_q.c_str());
@@ -74,15 +74,25 @@ try
    {
      cache_item->valid = false;
    }
- cache_item->data = "hello world";
-  return !cache_item->valid;
+
+  return cache_item->valid;
 }
 
 void mtn_cms_page_builder::storecache(const std::string& page, mtn_cms_cache_item* cache_item)
 {
   try
     {
-    }
+      //Mutex here
+      std::string q = "DELETE FROM `page_cache` WHERE page = \'" + page + "\';";
+      _db->execScalar(q.c_str());
+
+      CppSQLite3Buffer buff;
+      buff.format("INSERT INTO `page_cache` (`page`, `data`, `created`, `ttl`)\
+                  VALUES (%Q, %Q, %n, %n)", page.c_str(),
+                  cache_item->data.c_str(),
+		  cache_item->created, cache_item->ttl);
+		  //Release here
+     }
   catch (CppSQLite3Exception ex)
     {
     }
@@ -93,32 +103,41 @@ bool mtn_cms_page_builder::buildpage(std::string page, std::string& data)
 {
   try
     {
+
+      mtn_cms_cache_item cache;
       std::ostringstream s;
       std::string head, nav, content, stamp, foot;
-     
+      time_t now = time(NULL);
+
+
       std::string _q;
  
-      _q = "SELECT * FROM `pages` WHERE page = \'" + page + "\'";
+      _q = "SELECT * FROM `pages` WHERE page = \'" + page + "\';";
       if ( _db->execQuery(_q.c_str()).eof() )
 	return false;
 
       content = _db->execQuery(_q.c_str()).getStringField("data");
 
-      _q = "SELECT * FROM `pages` WHERE page = \'Navigation\'";
+      _q = "SELECT * FROM `pages` WHERE page = \'Navigation\';";
       nav = _db->execQuery(_q.c_str()).getStringField("data");
 
-      _q = "SELECT * FROM `pages` WHERE page = \'Header\'";
+      _q = "SELECT * FROM `pages` WHERE page = \'Header\';";
       head = _db->execQuery(_q.c_str()).getStringField("data");
 
-      _q = "SELECT * FROM `pages` WHERE page = \'Footer\'";
+      _q = "SELECT * FROM `pages` WHERE page = \'Footer\';";
       foot = _db->execQuery(_q.c_str()).getStringField("data");
 
-      stamp = datestamp(time(NULL), 60);
+      stamp = datestamp(now, 60);
 
       s << head << nav << content << stamp << foot;
 
+      cache.data = s.str();
+      cache.ttl = 60;
+      cache.created = now;
+
       data = s.str();
 
+      storecache(page, &cache);
       return true;
     }
   catch (CppSQLite3Exception ex)

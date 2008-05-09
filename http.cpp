@@ -218,17 +218,18 @@ void* mtn_cms_http_worker(void *ptr)
     mtn_cms_http_response_data response;
     mtn_cms_read_header(data->sock, request);
     mtn_cms_page_builder pb;
-    std::string content = "mycontent";
+    std::string content = "";
     bool validcontent=false;
-    mymtn->open("./test.mtn");
+    mymtn->open("./mtn.cms");
     switch(request.method)
     {
     case MTN_CMS_HTTP_METHOD_GET:
+      perror(request.page.c_str());
       pb.getpage(&response, &request, mymtn, &content);
       validcontent=true;
       break;
     default:
-      response.status = MTN_CMS_HTTP_STATUS_HTTP_VERSION_NOT_SUPPORTED;
+      response.status = MTN_CMS_HTTP_STATUS_NOT_IMPLEMENTED;
       break;
     }
     
