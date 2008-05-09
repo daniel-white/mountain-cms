@@ -26,6 +26,7 @@ void mtn_cms_page_builder::getpage( mtn_cms_http_response_data* response,
 	  response->status = MTN_CMS_HTTP_STATUS_OK;
 	  response->length = cache.data.length();
 	  response->content_type = MTN_CMS_MIME_TEXT_HTML;
+	  return;
 	} 
     }
   
@@ -44,11 +45,10 @@ void mtn_cms_page_builder::getpage( mtn_cms_http_response_data* response,
 
 std::string mtn_cms_page_builder::datestamp(const time_t& time, int ttl)
 {
-  std::string ret = "<h1>Page last built at ";
-  ret += mtn_cms_http_time_to_gmt_string(time);
-  ret += " with a T.T.L. of ";
-  ret += ttl;
-  ret += "second(s) </h1>\n";
+  std::ostringstream ret;
+  ret << "<h1>Page last built at " << mtn_cms_http_time_to_gmt_string(time);
+  ret << " with a T.T.L. of " << ttl << " second(s) </h1>";
+  return ret.str();
 }
 
 bool mtn_cms_page_builder::getcache(const std::string& page, mtn_cms_cache_item* cache_item)
@@ -58,7 +58,6 @@ try
   {
   CppSQLite3Query q = _db->execQuery(_q.c_str());
 
-  perror("hola");
 
   while (!q.eof())
     {
@@ -82,20 +81,32 @@ void mtn_cms_page_builder::storecache(const std::string& page, mtn_cms_cache_ite
 {
   try
     {
+      perror(cache_item->data.c_str());
       //Mutex here
       std::string q = "DELETE FROM `page_cache` WHERE page = \'" + page + "\';";
-      _db->execScalar(q.c_str());
+       _db->execScalar(q.c_str());
 
-      CppSQLite3Buffer buff;
-      buff.format("INSERT INTO `page_cache` (`page`, `data`, `created`, `ttl`)\
-                  VALUES (%Q, %Q, %n, %n)", page.c_str(),
-                  cache_item->data.c_str(),
-		  cache_item->created, cache_item->ttl);
-		  //Release here
-     }
-  catch (CppSQLite3Exception ex)
-    {
     }
+       catch (CppSQLite3Exception ex)
+	 {
+	 }
+
+  // try
+       //  {
+	 std::ostringstream q;
+
+     
+	 q << "INSERT INTO `page_cache` (`page`, `data`, `created`, `ttl`)";
+	 q << " VALUES (\'" <<  page << "\', \'";
+	 q << cache_item->data << "\', " << cache_item->created;
+	 q << ", " << cache_item->ttl << ");";
+
+	 _db->execScalar(q.str().c_str());
+		  //Release here
+	 //   }
+	 // catch (CppSQLite3Exception ex)
+	 // {
+	 // }
 
 }
 
@@ -127,16 +138,19 @@ bool mtn_cms_page_builder::buildpage(std::string page, std::string& data)
       _q = "SELECT * FROM `pages` WHERE page = \'Footer\';";
       foot = _db->execQuery(_q.c_str()).getStringField("data");
 
-      stamp = datestamp(now, 60);
+      //  stamp = datestamp(now, 60);
 
-      s << head << nav << content << stamp << foot;
+      // perror(stamp);
+
+
+      s << head << nav << content << datestamp(now, 60) << foot;
 
       cache.data = s.str();
       cache.ttl = 60;
       cache.created = now;
 
       data = s.str();
-
+    
       storecache(page, &cache);
       return true;
     }

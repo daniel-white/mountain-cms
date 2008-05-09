@@ -224,7 +224,6 @@ void* mtn_cms_http_worker(void *ptr)
     switch(request.method)
     {
     case MTN_CMS_HTTP_METHOD_GET:
-      perror(request.page.c_str());
       pb.getpage(&response, &request, mymtn, &content);
       validcontent=true;
       break;
