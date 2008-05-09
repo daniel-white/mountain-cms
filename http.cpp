@@ -204,7 +204,7 @@ std::string mtn_cms_http_make_response(const mtn_cms_http_response_data& data)
       response << "Content-Type: " << data.content_type << "\n";
 
     if (data.content_encoding.length())
-      response << "Content-Encoding: " << data.content_encoding << "\n\n";
+      response << "Content-Encoding: " << data.content_encoding << "\n\n\n";
 
     return response.str();
 }
@@ -218,12 +218,14 @@ void* mtn_cms_http_worker(void *ptr)
     mtn_cms_http_response_data response;
     mtn_cms_read_header(data->sock, request);
     mtn_cms_page_builder pb;
-    std::string content;
+    std::string content = "mycontent";
+    bool validcontent=false;
     mymtn->open("./test.mtn");
     switch(request.method)
     {
     case MTN_CMS_HTTP_METHOD_GET:
-      pb.getpage(&response, &request, mymtn, &content); 
+      pb.getpage(&response, &request, mymtn, &content);
+      validcontent=true;
       break;
     default:
       response.status = MTN_CMS_HTTP_STATUS_HTTP_VERSION_NOT_SUPPORTED;
@@ -234,7 +236,8 @@ void* mtn_cms_http_worker(void *ptr)
     std::string response_s = mtn_cms_http_make_response(response);
 
     write(data->sock, response_s.data(), response_s.length());
-    write(data->sock, content.data(), content.length());
+    if(validcontent)
+      write(data->sock, content.data(), content.length());
 	
     close(data->sock);
 }
@@ -337,7 +340,6 @@ void mtn_cms_start_listen(int portnum, int maxconn, CppSQLite3DB& db)
           td->data.addr = addr;
           td->data.addrlen = addrlen;
 
-	  perror("here");
           pthread_create(&td->thread, NULL, mtn_cms_http_worker, (void *)&td->data);
           pthread_join(td->thread, NULL);
 	 

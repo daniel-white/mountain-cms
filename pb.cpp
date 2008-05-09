@@ -20,19 +20,25 @@ void mtn_cms_page_builder::getpage( mtn_cms_http_response_data* response,
   if (getcache(request->page, &cache))
     {
       time_t t = time(NULL);
-      if ( t >= (cache.ttl + cache.created) )
+      if ( t <= (cache.ttl + cache.created) )
 	{
-	  (*content) = buildpage(request->page);
-	  response->length = content->length();
+	  (*content) = cache.data;
 	  response->status = MTN_CMS_HTTP_STATUS_OK;
-	  return;
-	}
+	  response->length = cache.data.length();
+	  response->content_type = MTN_CMS_MIME_TEXT_HTML;
+	} 
     }
-  else
+  
+  if ( buildpage(request->page, *content))
     {
-    }
+      response->status = MTN_CMS_HTTP_STATUS_OK;
+      response->length = content->length();
+      response->content_type = MTN_CMS_MIME_TEXT_HTML;
+      return;
+   }
 
-  response->status = 404;
+
+  response->status = MTN_CMS_HTTP_STATUS_NOT_FOUND;
   return;
 }
 
@@ -48,7 +54,11 @@ std::string mtn_cms_page_builder::datestamp(const time_t& time, int ttl)
 bool mtn_cms_page_builder::getcache(const std::string& page, mtn_cms_cache_item* cache_item)
 {
   std::string _q = "SELECT * FROM `page_cache` WHERE page = \'" + page + "\'"; 
+try
+  {
   CppSQLite3Query q = _db->execQuery(_q.c_str());
+
+  perror("hola");
 
   while (!q.eof())
     {
@@ -59,14 +69,60 @@ bool mtn_cms_page_builder::getcache(const std::string& page, mtn_cms_cache_item*
       cache_item->valid = true;
       q.nextRow();
     } 
-
-  return cache_item->valid;
+  }
+ catch (CppSQLite3Exception ex)
+   {
+     cache_item->valid = false;
+   }
+ cache_item->data = "hello world";
+  return !cache_item->valid;
 }
 
 void mtn_cms_page_builder::storecache(const std::string& page, mtn_cms_cache_item* cache_item)
 {
+  try
+    {
+    }
+  catch (CppSQLite3Exception ex)
+    {
+    }
+
 }
 
-std::string mtn_cms_page_builder::buildpage(std::string page)
+bool mtn_cms_page_builder::buildpage(std::string page, std::string& data)
 {
+  try
+    {
+      std::ostringstream s;
+      std::string head, nav, content, stamp, foot;
+     
+      std::string _q;
+ 
+      _q = "SELECT * FROM `pages` WHERE page = \'" + page + "\'";
+      if ( _db->execQuery(_q.c_str()).eof() )
+	return false;
+
+      content = _db->execQuery(_q.c_str()).getStringField("data");
+
+      _q = "SELECT * FROM `pages` WHERE page = \'Navigation\'";
+      nav = _db->execQuery(_q.c_str()).getStringField("data");
+
+      _q = "SELECT * FROM `pages` WHERE page = \'Header\'";
+      head = _db->execQuery(_q.c_str()).getStringField("data");
+
+      _q = "SELECT * FROM `pages` WHERE page = \'Footer\'";
+      foot = _db->execQuery(_q.c_str()).getStringField("data");
+
+      stamp = datestamp(time(NULL), 60);
+
+      s << head << nav << content << stamp << foot;
+
+      data = s.str();
+
+      return true;
+    }
+  catch (CppSQLite3Exception ex)
+    {
+    }
+  return false;
 }

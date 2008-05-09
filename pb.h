@@ -40,6 +40,6 @@ class mtn_cms_page_builder
   std::string datestamp(const time_t& time, int ttl);
   bool getcache(const std::string& page, mtn_cms_cache_item* cache_item);
   void storecache(const std::string& page, mtn_cms_cache_item* cache_item);
-  std::string buildpage(std::string page); 
+  bool buildpage(std::string page, std::string& data); 
 };
 #endif
