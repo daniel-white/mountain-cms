@@ -1,0 +1,1 @@
+A simple Web server and CMS in one package.  Uses SQLite to store data.
